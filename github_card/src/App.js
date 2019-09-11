@@ -1,54 +1,59 @@
 import React from "react";
 import "./App.css";
+// import CardList from "./CardList";
+import CardData from "./CardData";
+import axios from "axios";
 
 class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      // githubCard: "",
-      card: {}
+      card: {},
+      followers: []
     };
   }
   componentDidMount() {
-    console.log("what's up?");
-    fetch("https://api.github.com/users/JacquelineOmollo")
-      .then(res => res.json())
-      .then(cards => console.log(cards))
-      .catch(error => console.log("No Good", error));
+    axios
+      .get("https://api.github.com/users/JacquelineOmollo")
+      .then(response => {
+        // console.log("Success! ", card);
+        this.setState({ card: response.data });
+      })
+      .catch(error => {
+        console.log("error: ", error);
+      });
+
+    axios
+      .get("https://api.github.com/users/JacquelineOmollo/followers")
+      .then(response => {
+        this.setState({ followers: response.data });
+      })
+      .catch(error => {
+        console.log("error: ", error);
+      });
   }
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (prevState.card !== this.state.cards) {
-  //     console.log("it works");
-  //     if (this.state.doggoText === "boxer") {
-  //       console.log("not allowed");
-  //       fetch("https://api.github.com/users/JacquelineOmollo")
-  //         .then(res => res.json())
-  //         .then(cards =>
-  //           this.setState({ githubCard: "", card: cards.followers })
-  //         )
-  //         .catch(error => console.log("No Good", error));
-  //     }
-  //   }
-  // }
-
   render() {
+    console.log(this.state.card);
+    console.log(this.state.followers);
     return (
       <div className="App">
-        <header className="App-header">
-          <h1>{this.state.card.name}</h1>
-          <p>{this.state.card.location}</p>
-          <p>{this.state.card.following}</p>
-        </header>
-        {this.state.card.map(id => (
-          <img
-            key={this.state.card.id}
-            width="200"
-            src={"https://avatars0.githubusercontent.com/u/42282797?v=4"}
-          />
+        <h1>User Github Card</h1>
+        <img src={this.state.card.avatar_url} />
+        <p>Name: {this.state.card.name}</p>
+        <p>Location: {this.state.card.location}</p>
+        <p>Following: {this.state.card.following}</p>
+
+        {this.state.followers.map(follower => (
+          <div key={follower.id}>
+            <img src={follower.avatar_url} />
+            <p>Name: {follower.name}</p>
+            <p>Location:{follower.location}</p>
+          </div>
         ))}
       </div>
     );
   }
 }
+
 export default App;
